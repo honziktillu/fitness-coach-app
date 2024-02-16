@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Link as LinkReact } from "react-router-dom";
 import { signUp } from "../../models/User";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Copyright(props: any) {
   return (
@@ -39,6 +40,7 @@ const defaultTheme = createTheme();
 
 export default function SignUp() {
   const [info, setInfo] = useState();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -49,11 +51,9 @@ export default function SignUp() {
       email: data.get("email") as string,
       password: data.get("password") as string,
     });
-    if (user.status == 201) {
-      //redirect
-      return;
-    }
-    setInfo(user.msg);
+    if (user.status == 201) return navigate("/signin");
+    if (user.status == 400) return setInfo(user.msg);
+    if (user.status == 500) return navigate("/error");
   };
 
   return (
@@ -98,7 +98,7 @@ export default function SignUp() {
                   fullWidth
                   id="lastname"
                   label="Last Name"
-                  name="lastName"
+                  name="lastname"
                   autoComplete="family-name"
                 />
               </Grid>
@@ -149,6 +149,7 @@ export default function SignUp() {
                 </LinkReact>
               </Grid>
             </Grid>
+            <p>{info}</p>
           </Box>
         </Box>
         <Copyright sx={{ mt: 5 }} />

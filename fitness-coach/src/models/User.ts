@@ -14,6 +14,10 @@ export const signUp = async (formData: User) => {
   }
 };
 
+export const signIn = async (formData: User) => {
+  const res = await fetch("http://localhost:3000/api/v1/user")
+}
+
 export type User = {
   id?: string;
   email?: string;

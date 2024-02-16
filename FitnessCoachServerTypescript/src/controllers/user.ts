@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import db from "../models/index";
-import { genSalt, hash } from "bcrypt";
+import { genSalt, hash, compare } from "bcrypt";
 
 const User = db.users;
 const AccountRoles = db.accountRoles;
@@ -36,10 +36,30 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
+export const loginUser = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password)
+      return res.status(400).send({ msg: "Missing details!" });
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) return res.status(404).send({ msg: "User not found!" });
+    const logged = await compare(password, user.password);
+    if (logged) {
+      return res.status(200).send({ msg: "User logged in!" });
+    } else {
+      return res.status(404).send({ msg: "Wrong password or email!" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+};
+
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { email, username, password } = req.body;
-    if (!email || !username || !password)
+    const { email, firstname, lastname, password } = req.body;
+    console.log(req.body);
+    if (!email || !firstname || !lastname || !password)
       return res.status(400).send({ msg: "Missing details!" });
     const user = await User.findOne({ where: { email: email } });
     if (user) return res.status(400).send({ msg: "User already exists!" });
@@ -47,7 +67,8 @@ export const createUser = async (req: Request, res: Response) => {
     const passwordHash = await hash(password, salt);
     const createdUser = await User.create({
       email: email,
-      username: username,
+      firstname: firstname,
+      lastname: lastname,
       password: passwordHash,
     });
     if (!createdUser)

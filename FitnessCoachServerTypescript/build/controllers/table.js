@@ -5,20 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUser = exports.updateUser = exports.createUser = exports.getUserById = exports.getAllUsers = void 0;
 const index_1 = __importDefault(require("../models/index"));
-const bcrypt_1 = require("bcrypt");
-const User = index_1.default.users;
-const AccountRoles = index_1.default.accountRoles;
+const User = index_1.default.tableStable;
 const getAllUsers = async (req, res) => {
     try {
         const users = await User.findAll();
         if (!users || users.length == 0)
             return res.status(500).send({ msg: "Users not found" });
-        const ownerRole = await AccountRoles.findOne({ where: { name: "owner" } });
-        const ownerAccounts = await ownerRole.getUser();
         return res.status(200).send({
             msg: "Users found",
             payload: users,
-            ownerAccounts,
         });
     }
     catch (error) {
@@ -45,19 +40,14 @@ const getUserById = async (req, res) => {
 exports.getUserById = getUserById;
 const createUser = async (req, res) => {
     try {
-        const { email, firstname, lastname, password } = req.body;
-        if (!email || !firstname || !lastname || !password)
+        const { tableText } = req.body;
+        if (!tableText)
             return res.status(400).send({ msg: "Missing details!" });
-        const user = await User.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { tableText: tableText } });
         if (user)
             return res.status(400).send({ msg: "User already exists!" });
-        const salt = await (0, bcrypt_1.genSalt)(10);
-        const passwordHash = await (0, bcrypt_1.hash)(password, salt);
         const createdUser = await User.create({
-            email: email,
-            firstname: firstname,
-            lastname: lastname,
-            password: passwordHash,
+            tableText: tableText
         });
         if (!createdUser)
             return res.status(500).send({ msg: "Something went wrong!" });

@@ -5,19 +5,47 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.UUID,
             defaultValue: Sequelize.UUIDV4, //neco jako auto_increment
             primaryKey: true,
+            allowNull: false,
+        },
+        firstname: {
+            type: Sequelize.STRING,
+            allowNull: false,
+        },
+        lastname: {
+            type: Sequelize.STRING,
             allowNull: false
+        },
+        dateOfBirth: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
+        weight: {
+            type: Sequelize.FLOAT,
+            allowNull: true
+        },
+        height: {
+            type: Sequelize.FLOAT,
+            allowNull: true
+        },
+        banner: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
+        profilePicture: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
+        stats: {
+            type: Sequelize.STRING,
+            allowNull: true
         },
         email: {
             type: Sequelize.STRING,
-            allowNull: false
+            allowNull: false,
         },
-        username: {
+        password: {
             type: Sequelize.STRING,
-            allowNull: false
-        },
-        passwordHash: {
-            type: Sequelize.STRING,
-            allowNull: false
+            allowNull: false,
         },
         verified: {
             type: Sequelize.BOOLEAN,
@@ -28,7 +56,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         updatedAt: {
             type: Sequelize.DATE,
-        }
+        },
     }, {
         timestamps: true,
     });
