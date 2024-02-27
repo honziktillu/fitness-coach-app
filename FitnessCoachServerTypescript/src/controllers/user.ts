@@ -1,4 +1,4 @@
-import e, { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import db from "../models/index";
 import { genSalt, hash, compare } from "bcrypt";
 
@@ -36,7 +36,11 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
@@ -45,7 +49,8 @@ export const loginUser = async (req: Request, res: Response) => {
     if (!user) return res.status(404).send({ msg: "User not found!" });
     const logged = await compare(password, user.password);
     if (logged) {
-      return res.status(200).send({ msg: "User logged in!" });
+      res.locals.email = email;
+      next();
     } else {
       return res.status(404).send({ msg: "Wrong password or email!" });
     }
@@ -111,4 +116,10 @@ export const deleteUser = async (req: Request, res: Response) => {
     console.log(error);
     res.status(500).send(error);
   }
+};
+
+export const testFunction = async (req: Request, res: Response) => {
+  res.send({
+    msg: "It works!",
+  });
 };
